@@ -68,4 +68,10 @@ public class MusixController {
         return "Song Updated!";
     }
 
+    @GetMapping("/names/{name}")
+    public ResponseEntity<List<Musix>> getByname(@PathVariable String name) {
+        List<Musix> musix = musixService.getByName(name);
+        return new ResponseEntity<List<Musix>>(musix, HttpStatus.OK);
+    }
+
 }
