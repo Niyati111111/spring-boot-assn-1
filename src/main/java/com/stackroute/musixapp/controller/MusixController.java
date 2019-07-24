@@ -1,6 +1,8 @@
 package com.stackroute.musixapp.controller;
 
 import com.stackroute.musixapp.domain.Musix;
+import com.stackroute.musixapp.exceptions.TrackAlreadyExistsException;
+import com.stackroute.musixapp.exceptions.TrackNotFoundException;
 import com.stackroute.musixapp.service.MusixService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,7 +31,7 @@ public class MusixController {
         try{
             musixService.saveNewMusix(musix);
             responseEntity= new ResponseEntity<String>("Successfully created", HttpStatus.CREATED);
-        } catch (Exception e) {
+        } catch (TrackAlreadyExistsException e) {
             responseEntity= new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT);
             e.printStackTrace();
         }
@@ -51,20 +53,37 @@ public class MusixController {
     @GetMapping("/muzix/{id}")
     public ResponseEntity<?> getById(@PathVariable int id) {
 
-        Musix musix = musixService.getById(id);
-        return new ResponseEntity<Musix>(musix, HttpStatus.OK);
+        ResponseEntity responseEntity;
+        try {
+            Musix musix = musixService.getById(id);
+            responseEntity = new ResponseEntity<Musix>(musix, HttpStatus.OK);
+        } catch (TrackNotFoundException ex) {
+            responseEntity = new ResponseEntity<String>(ex.getMessage(), HttpStatus.CONFLICT);
+            ex.printStackTrace();
+        }
+        return responseEntity;
     }
 
     @DeleteMapping("/delete/{id}")
     public String deleteMusix(@PathVariable int id) {
-        musixService.deleteById(id);
+
+        try {
+            musixService.deleteById(id);
+        } catch (TrackNotFoundException e) {
+            return e.getMessage();
+        }
+
         return "Data deleted";
     }
 
     @PutMapping("/update/{id}")
     public String updateMusix(@RequestBody Musix musix, @PathVariable int id) {
 
-        musixService.updateById(musix, id);
+        try {
+            musixService.updateById(musix, id);
+        } catch (TrackNotFoundException e) {
+            return e.getMessage();
+        }
         return "Song Updated!";
     }
 

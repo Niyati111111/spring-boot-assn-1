@@ -1,6 +1,8 @@
 package com.stackroute.musixapp.service;
 
 import com.stackroute.musixapp.domain.Musix;
+import com.stackroute.musixapp.exceptions.TrackAlreadyExistsException;
+import com.stackroute.musixapp.exceptions.TrackNotFoundException;
 import com.stackroute.musixapp.repository.MusixRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,9 +21,15 @@ public class MusixServiceImpl implements MusixService {
     }
 
     @Override
-    public Musix saveNewMusix(Musix musix) {
-        Musix musix1 = musixRepository.save(musix);
-        return musix1;
+    public Musix saveNewMusix(Musix musix) throws TrackAlreadyExistsException {
+        if(musixRepository.existsById(musix.getId())){
+            throw new TrackAlreadyExistsException("User already exists!");
+        }
+        Musix savedTrack = musixRepository.save(musix);
+        if(savedTrack == null) {
+            throw new TrackAlreadyExistsException("User already exists!");
+        }
+        return savedTrack;
     }
 
     @Override
@@ -30,22 +38,30 @@ public class MusixServiceImpl implements MusixService {
     }
 
     @Override
-    public Musix getById(int id) {
+    public Musix getById(int id) throws TrackNotFoundException{
         Optional<Musix> userId = musixRepository.findById(id);
+        if(userId.isEmpty()){
+            throw new TrackNotFoundException("Track not found!");
+        }
         return userId.get();
     }
 
     @Override
-    public void deleteById(int id) {
+    public void deleteById(int id) throws TrackNotFoundException {
+        Optional<Musix> userId = musixRepository.findById(id);
+        if(userId.isEmpty()){
+            throw new TrackNotFoundException("Track not found!");
+        }
         musixRepository.deleteById(id);
     }
 
     @Override
-    public boolean updateById(Musix musix, int id) {
+    public boolean updateById(Musix musix, int id) throws TrackNotFoundException {
         Optional<Musix> userOptional = musixRepository.findById(id);
 
-        if (!userOptional.isPresent())
-            return false;
+        if(userOptional.isEmpty()){
+            throw new TrackNotFoundException("Track not found!");
+        }
 
         musix.setId(id);
 
@@ -53,6 +69,7 @@ public class MusixServiceImpl implements MusixService {
         return true;
     }
 
+    @Override
     public List<Musix> getByName(String name) {
         List<Musix> userId = musixRepository.findTitleByName(name);
         return userId;
