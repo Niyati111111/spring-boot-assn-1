@@ -69,7 +69,7 @@ public class MusixController {
     }
 
     @GetMapping("/names/{name}")
-    public ResponseEntity<List<Musix>> getByname(@PathVariable String name) {
+    public ResponseEntity<List<Musix>> getByName(@PathVariable String name) {
         List<Musix> musix = musixService.getByName(name);
         return new ResponseEntity<List<Musix>>(musix, HttpStatus.OK);
     }
