@@ -15,9 +15,9 @@ public class SwaggerConfiguration {
     @Bean
     public Docket productApi() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .select().apis(RequestHandlerSelectors.basePackage("com.stackroute.musixapp"))
-                .paths(regex("/muzixapp/v1.*"))
-                .build();
+                  .select().apis(RequestHandlerSelectors.basePackage("com.stackroute.musixapp"))
+                  .paths(regex("/muzixapp/v1.*"))
+                  .build();
     }
 }
 
